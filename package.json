@@ -1,0 +1,13 @@
+{
+  "name": "@ywkrlerche/mathwizard",
+  "version": "1.0.0",
+  "description": "Math practice hub",
+  "license": "UNLICENSED",
+  "files": [
+    "index.html",
+    "style.css",
+    "app.js",
+    "config.js",
+    "games.json"
+  ]
+}
