@@ -26,13 +26,17 @@
         if (!res.ok) throw new Error("HTTP " + res.status);
         let html = await res.text();
         html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
-        const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
         const frame = document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");
         frame.setAttribute("allow", "fullscreen; autoplay; gamepad; pointer-lock");
         frame.setAttribute("allowfullscreen", "");
-        frame.onload = () => { msg.remove(); frame.contentWindow.focus(); };
-        frame.src = url;
         document.getElementById("root").appendChild(frame);
+        // Write the page into a blank frame so it keeps this real https:// address (games need it)
+        const doc = frame.contentDocument;
+        doc.open();
+        doc.write(html);
+        doc.close();
+        msg.remove();
+        frame.contentWindow.focus();
       } catch (err) {
         msg.textContent = "Couldn't load the site (" + err.message + "). Try refreshing.";
       }

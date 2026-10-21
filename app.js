@@ -31,7 +31,7 @@
   let games = [];
   let byId = new Map();
   let activeTag = "All";
-  let currentLoad = null; // { controller, blobUrl, id }
+  let currentLoad = null; // { controller, id }
 
   // ---------- Helpers ----------
   function hash(str) {
@@ -114,11 +114,13 @@
 
   // ---------- Game loading ----------
   // jsDelivr serves .html as text/plain (so it can't be iframed directly), and caps files at 20 MB.
-  // So we fetch the file (or all its .partN pieces), join them, and run it from a local blob: URL.
+  // So we fetch the file (or all its .partN pieces), join them, and write the HTML into a blank iframe.
+  // Writing (instead of a blob: URL) gives the game a normal https:// address, which many games need
+  // to work out paths (Unity, Ruffle/Flash and others crash on blob: URLs).
   async function loadGame(game) {
     stopGame();
     const controller = new AbortController();
-    currentLoad = { controller, blobUrl: null, id: game.id };
+    currentLoad = { controller, id: game.id };
 
     els.playerTitle.textContent = game.name;
     els.loaderName.textContent = game.name;
@@ -156,16 +158,16 @@
         return chunks;
       }));
       if (currentLoad?.id !== game.id) return;
-      const blob = new Blob(pieces.flat(), { type: "text/html" });
-      currentLoad.blobUrl = URL.createObjectURL(blob);
       els.loaderStatus.textContent = "Starting…";
-      els.frame.onload = () => {
-        if (currentLoad?.id !== game.id) return;
-        els.loader.hidden = true;
-        hookFrameKeys();
-        try { els.frame.contentWindow.focus(); } catch {}
-      };
-      els.frame.src = currentLoad.blobUrl;
+      const html = await new Blob(pieces.flat()).text();
+      if (currentLoad?.id !== game.id) return;
+      const doc = freshFrame().contentDocument;
+      doc.open();
+      doc.write(html);
+      doc.close();
+      els.loader.hidden = true;
+      hookFrameKeys();
+      try { els.frame.contentWindow.focus(); } catch {}
     } catch (err) {
       if (err.name === "AbortError") return;
       console.error(err);
@@ -177,10 +179,16 @@
   function stopGame() {
     if (!currentLoad) return;
     currentLoad.controller.abort();
-    if (currentLoad.blobUrl) URL.revokeObjectURL(currentLoad.blobUrl);
     currentLoad = null;
-    els.frame.onload = null;
-    els.frame.src = "about:blank";
+    freshFrame();
+  }
+
+  // Swap in a brand-new blank iframe (same attributes, including sandbox) so nothing from the last game lingers
+  function freshFrame() {
+    const fresh = els.frame.cloneNode(false);
+    els.frame.replaceWith(fresh);
+    els.frame = fresh;
+    return fresh;
   }
 
   // The blob: page is same-origin, so we can listen for the panic keys inside the game too
