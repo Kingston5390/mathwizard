@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <title>Richards Unblocked Games</title>
+  <!--
+    jsDelivr serves .html as text/plain (shown as raw code) but serves .svg as image/svg+xml,
+    which browsers open as a real document that can run scripts. This launcher fetches
+    index.html from the same folder, points its relative links (style.css, app.js, games.json)
+    back at jsDelivr with a <base> tag, and shows it full-screen in an iframe.
+  -->
+  <style><![CDATA[
+    html, body, svg { margin: 0; padding: 0; width: 100%; height: 100%; background: #0b0d14; overflow: hidden; }
+    iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #0b0d14; }
+    .msg { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+           color: #8b90ab; font: 15px system-ui, "Segoe UI", sans-serif; }
+  ]]></style>
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml" id="root" style="width:100%;height:100%">
+      <div class="msg" id="msg">Loading…</div>
+    </div>
+  </foreignObject>
+  <script><![CDATA[
+    (async () => {
+      const base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
+      const msg = document.getElementById("msg");
+      try {
+        const res = await fetch(base + "index.html", { cache: "no-cache" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        let html = await res.text();
+        html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
+        const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+        const frame = document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");
+        frame.setAttribute("allow", "fullscreen; autoplay; gamepad; pointer-lock");
+        frame.setAttribute("allowfullscreen", "");
+        frame.onload = () => { msg.remove(); frame.contentWindow.focus(); };
+        frame.src = url;
+        document.getElementById("root").appendChild(frame);
+      } catch (err) {
+        msg.textContent = "Couldn't load the site (" + err.message + "). Try refreshing.";
+      }
+    })();
+  ]]></script>
+</svg>

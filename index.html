@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Richards Unblocked Games</title>
+  <meta name="description" content="Fast, lightweight game dashboard.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕹️</text></svg>">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Apply saved theme before paint so there's no flash
+    try { document.documentElement.dataset.theme = localStorage.getItem("rug-theme") || "dark"; } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Home">
+      <span class="brand-mark">R</span>
+      <span class="brand-text">Richards <b>Unblocked</b> Games</span>
+    </a>
+
+    <button class="clock-island" id="clock" type="button" title="Click to switch 12h / 24h">
+      <span class="clock-dot"></span>
+      <span class="clock-time" id="clock-time">--:--</span>
+      <span class="clock-meta" id="clock-meta"></span>
+    </button>
+
+    <div class="actions">
+      <button class="icon-btn" id="random-btn" type="button" title="Random game">🎲<span class="label">Random</span></button>
+      <button class="icon-btn" id="theme-btn" type="button" title="Toggle theme">🌙</button>
+      <button class="icon-btn panic" id="panic-btn" type="button" title="Panic (` or ])">🚨<span class="label">Panic</span></button>
+    </div>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 0 1 5.96 12.06l4.24 4.24-1.42 1.42-4.24-4.24A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z"/></svg>
+        <input id="search" type="search" placeholder="Search games…" autocomplete="off" spellcheck="false" aria-label="Search games">
+        <kbd class="search-hint">/</kbd>
+      </div>
+      <div class="chips" id="chips" role="tablist" aria-label="Categories"></div>
+    </section>
+
+    <section class="row" id="recent-section" hidden>
+      <div class="row-head">
+        <h2>🕹️ Recently Played</h2>
+        <button class="text-btn" id="clear-recent" type="button">Clear</button>
+      </div>
+      <div class="grid recent" id="recent-grid"></div>
+    </section>
+
+    <section class="row">
+      <div class="row-head">
+        <h2 id="all-title">All Games</h2>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden>No games match that search.</p>
+    </section>
+  </main>
+
+  <section class="player" id="player" hidden aria-label="Game player">
+    <div class="player-bar">
+      <button class="icon-btn" id="back-btn" type="button" title="Back to games">←<span class="label">Games</span></button>
+      <h1 class="player-title" id="player-title"></h1>
+      <div class="actions">
+        <button class="icon-btn" id="reload-btn" type="button" title="Restart game">↻</button>
+        <button class="icon-btn" id="fullscreen-btn" type="button" title="Fullscreen">⛶</button>
+        <button class="icon-btn panic" id="panic-btn-2" type="button" title="Panic (` or ])">🚨</button>
+      </div>
+    </div>
+    <div class="stage">
+      <iframe id="game-frame" title="Game" allow="fullscreen; autoplay; gamepad; pointer-lock" allowfullscreen></iframe>
+      <div class="loader" id="loader">
+        <div class="loader-card">
+          <div class="loader-thumb" id="loader-thumb"></div>
+          <p class="loader-name" id="loader-name"></p>
+          <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+          <p class="loader-status" id="loader-status">Connecting…</p>
+          <button class="text-btn" id="retry-btn" type="button" hidden>Try again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>Press <kbd>`</kbd> or <kbd>]</kbd> to panic</span>
+    <span id="footer-count"></span>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
